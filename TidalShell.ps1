@@ -642,7 +642,7 @@ function Tidal-GetArtistSimilar
 	param
 	(
 		$Id,
-		[uint32]$Limit, [uint32]$Offset, [switch]$AllItems # Pagination
+		[uint32]$Limit, [uint32]$Offset, [switch]$AllItems # Pagination - TODO: Does not seem to work for this request?
 	)
 	Tidal-InvokeRequest "artists/${Id}/similar" -Limit:$Limit -Offset:$Offset -AllItems:$AllItems -RegionAndSession
 }
@@ -1286,7 +1286,7 @@ function Tidal-GetSimilarArtists
 	param
 	(
 		[string]$Name,
-		[uint32]$Limit, [uint32]$Offset, [switch]$AllItems # Pagination
+		[uint32]$Limit, [uint32]$Offset, [switch]$AllItems # Pagination - TODO: Does not seem to work for Tidal-GetArtistSimilar?
 	)
 	Tidal-GetArtistSimilar (Tidal-GetArtistByName $Name).id -Limit:$Limit -Offset:$Offset -AllItems:$AllItems
 }
@@ -1304,7 +1304,7 @@ function Tidal-GetSimilarArtistsMultiLevelInternal
 	try
 	{
 		if ($BranchLimit -gt 0) {
-			$similarArtists = (Tidal-GetArtistSimilar $Artist.id -Limit $BranchLimit).items
+			$similarArtists = (Tidal-GetArtistSimilar $Artist.id -Limit $BranchLimit).items[0..($BranchLimit-1)] # NOTE: Slicing the array as a workaround for -Limit not working on Tidal-GetArtistSimilar.
 		} else {
 			$similarArtists = Tidal-GetArtistSimilar $Artist.id -AllItems
 		}
@@ -1354,7 +1354,7 @@ function Tidal-GetArtistSimilaritiesInternal
 	{
 		$ArtistsFound.value += @($Artist.name)
 		if ($BranchLimit -gt 0) {
-			$similarArtists = (Tidal-GetArtistSimilar $Artist.id -Limit $BranchLimit).items
+			$similarArtists = (Tidal-GetArtistSimilar $Artist.id -Limit $BranchLimit).items[0..($BranchLimit-1)] # NOTE: Slicing the array as a workaround for -Limit not working on Tidal-GetArtistSimilar.
 		} else {
 			$similarArtists = Tidal-GetArtistSimilar $Artist.id -AllItems
 		}
