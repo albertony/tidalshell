@@ -4,6 +4,8 @@ Unofficial PowerShell wrapper of the [Tidal](https://tidal.com/) REST API.
 The main objective for now is to have a test bench for exploring the features
 of the API, not an extremely robust and efficient interface.
 
+### WARNING: The script is not currently working, as it has not been updated according to Tidal's move to pure OAuth token based authentication!
+
 See also [blushell](https://github.com/albertony/blushell),
 PowerShell wrapper for the API of the BluOS music management system.
 
