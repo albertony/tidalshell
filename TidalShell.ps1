@@ -1260,7 +1260,8 @@ function Tidal-SaveTrack
 		[ValidateSet('LOSSLESS', 'HIGH', 'LOW')]
 		$Quality = $TidalSubscription.highestSoundQuality,
 		$Vlc = "vlc",
-		$Options = @()
+		$Options = @(),
+		[switch] $Overwrite
 	)
 	$stream = Tidal-GetTrackStreamURL $Id $Quality
 	if (-not $stream) { return }
@@ -1269,10 +1270,17 @@ function Tidal-SaveTrack
 	$expandedFolderPath = Resolve-Path $OutputFolder -ErrorAction Stop
 	$expandedFileName = Get-ValidFileName (Expand-Properties $track $FileName)
 	$outputFilePath = Join-Path $expandedFolderPath $expandedFileName
-	Write-Host "Streaming track ${Id} - $($track.artist.name) - $($track.album.title) - $($track.trackNumber) - $($track.title)..."
-	Write-Host "Writing to file $outputFilePath..."
-	#&$vlc rtmp://$($stream.url) --sout file/mp4:${File} --qt-start-minimized --play-and-exit
-	Start-Process -Wait -FilePath $vlc -ArgumentList ("rtmp://$($stream.url)","--sout file/mp4:`"${outputFilePath}`"","--qt-start-minimized","--play-and-exit" + $Options)
+	if (-not $Overwrite -and (Test-Path -LiteralPath $outputFilePath))
+	{
+		Write-Warning "Output path already exists: ${outputFilePath}"
+	}
+	else
+	{
+		Write-Host "Streaming track ${Id} - $($track.artist.name) - $($track.album.title) - $($track.trackNumber) - $($track.title)..."
+		Write-Host "Writing to file $outputFilePath..."
+		#&$vlc rtmp://$($stream.url) --sout file/mp4:${File} --qt-start-minimized --play-and-exit
+		Start-Process -Wait -FilePath $vlc -ArgumentList ("rtmp://$($stream.url)","--sout file/mp4:`"${outputFilePath}`"","--qt-start-minimized","--play-and-exit" + $Options)
+	}
 }
 
 function Tidal-GetArtistByName($Name)
